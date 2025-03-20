@@ -4,6 +4,12 @@
 
 Task Shelter is a task management system that allows you to manage your tasks. It is currently incomplete, but when that changes you'll find this file updated.
 
+## Demo Video
+
+Check out this demo video to see Task Shelter in action:
+
+[![Task Shelter Demo](https://img.youtube.com/vi/6JfFk8vzBfs/0.jpg)](https://youtu.be/6JfFk8vzBfs)
+
 > Assumptions:
 >
 > - You have node and yarn installed.
