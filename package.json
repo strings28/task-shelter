@@ -1,0 +1,28 @@
+{
+  "name": "task-shelter",
+  "version": "1.0.0",
+  "description": "Monorepo containing NestJS backend with Prisma and NextJS frontend",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently --names \"FRONTEND,BACKEND\" --prefix-colors \"blue,green\" \"yarn workspace frontend dev\" \"yarn workspace backend dev\"",
+    "dev:backend": "yarn workspace apps/backend dev",
+    "dev:frontend": "yarn workspace apps/frontend dev",
+    "build": "yarn workspace frontend build && yarn workspace backend build",
+    "build:backend": "yarn workspace apps/backend build",
+    "build:frontend": "yarn workspace apps/frontend build",
+    "start": "concurrently \"yarn workspace frontend start\" \"yarn workspace backend start:prod\"",
+    "test": "yarn workspace backend test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447",
+  "devDependencies": {
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
+    "concurrently": "^8.2.0"
+  }
+}

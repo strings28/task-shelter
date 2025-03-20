@@ -1,0 +1,107 @@
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { JWT } from "next-auth/jwt";
+
+export const authConfig = {
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  callbacks: {
+    async jwt({
+      token,
+      user,
+      account,
+    }: {
+      token: JWT;
+      user?: any;
+      account?: any;
+    }) {
+      // Initial sign in
+      if (account && user) {
+        return {
+          ...token,
+          user: {
+            id: user.id,
+            email: user.email,
+            firstname: user.firstname,
+            lastname: user.lastname,
+          },
+        };
+      }
+      return token;
+    },
+    async session({ session, token }: { session: any; token: JWT }) {
+      if (token.user) {
+        session.user = {
+          id: token.user.id,
+          email: token.user.email,
+          accessToken: token.user.accessToken,
+        };
+      }
+      return session;
+    },
+  },
+  providers: [
+    Credentials({
+      name: "Email & Password",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+
+        try {
+          // Call your backend API instead of directly using Prisma
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: credentials.email,
+                password: credentials.password,
+              }),
+            },
+          );
+
+          if (!response.ok) {
+            return null;
+          }
+
+          const data = await response.json();
+
+          // Return user data from the backend response
+          return {
+            id: data.user.id,
+            email: data.user.email,
+            // Include JWT token for future requests
+            accessToken: data.access_token,
+          };
+        } catch (error) {
+          return null;
+        }
+      },
+    }),
+  ],
+  pages: {
+    signIn: "/auth/signin",
+    signOut: "/auth/signout",
+    error: "/auth/error",
+    verifyRequest: "/auth/verify-request",
+    newUser: "/auth/new-user",
+  },
+};
+
+export const {
+  handlers: { GET, POST },
+  auth,
+  signIn,
+  signOut,
+} =
+  // listen we all know this is gross. I'm sorry. I'm sorry.
+  NextAuth(authConfig as any);
